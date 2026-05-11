@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work | AAYUSH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="10style.css">
+</head>
+<body>
+
+<div class="bg-layer" id="bg-space"><img src="https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1600&q=80" alt="space"></div>
+<div class="bg-layer" id="bg-rain"><img src="https://images.unsplash.com/photo-1438449805896-28a666819a20?w=1600&q=80" alt="rain"></div>
+<div class="bg-layer" id="bg-snow"><img src="https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=1600&q=80" alt="snow"></div>
+<div class="bg-layer" id="bg-sun"><img src="https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?w=1600&q=80" alt="sun"></div>
+<div class="bg-layer" id="bg-rain-video"><video autoplay muted loop playsinline class="bg-video"><source src="videos/your_video.mp4" type="video/mp4"></video></div>
+
+<canvas id="rain-canvas"></canvas>
+<canvas id="snow-canvas"></canvas>
+
+<div class="page-wrapper">
+    <nav class="navbar">
+        <div class="navbar-top">
+            <a href="index.html" class="nav-logo"><div class="logo-icon"><svg viewBox="0 0 36 36"><polygon points="18,3 33,30 3,30" fill="none" stroke="currentColor" stroke-width="2.5"/><line x1="9" y1="22" x2="27" y2="22" stroke="currentColor" stroke-width="2"/></svg></div><span class="logo-name">AAYUSH</span></a>
+            <div class="theme-switcher" id="themeSwitcher"><button class="theme-btn" id="themeBtn"><span id="themeIcon"></span><span id="themeLabel">Theme</span><svg class="chevron" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg></button><div class="theme-dropdown" id="themeDropdown"><div class="theme-option" data-theme="space">🌙 Night Mode</div><div class="theme-option" data-theme="rain">☔ Rain Mode</div><div class="theme-option" data-theme="snow">❄️ Snow Mode</div><div class="theme-option" data-theme="sun">☀️ Sunny Mode</div></div></div>
+        </div>
+        <ul class="nav-menu"><li class="nav-item"><a href="index.html" class="nav-link">🏠 Home</a></li><li class="nav-item"><a href="work.html" class="nav-link active">🎨 Work</a></li><li class="nav-item"><a href="blogs.html" class="nav-link">📝 Blogs</a></li><li class="nav-item"><a href="resume.html" class="nav-link">📄 Resume</a></li><li class="nav-item"><a href="contact.html" class="nav-link">✉️ Contact</a></li></ul>
+    </nav>
+    
+    <section class="page-header">
+        <h1>My Work</h1>
+        <p>A collection of projects I've built</p>
+    </section>
+    
+    <section class="projects-grid-full">
+        <div class="project-card-full"><img src="https://placehold.co/600x400/1a1a2e/4f8fff?text=Project+1"><h3>E-Commerce Platform</h3><p>Full-stack shopping cart with payment gateway</p><div class="project-tech"><span>React</span><span>Node.js</span><span>MongoDB</span></div><a href="#">Live Demo →</a></div>
+        <div class="project-card-full"><img src="https://placehold.co/600x400/1a1a2e/4f8fff?text=Project+2"><h3>Analytics Dashboard</h3><p>Real-time data visualization dashboard</p><div class="project-tech"><span>Next.js</span><span>Chart.js</span><span>Tailwind</span></div><a href="#">Live Demo →</a></div>
+        <div class="project-card-full"><img src="https://placehold.co/600x400/1a1a2e/4f8fff?text=Project+3"><h3>Portfolio Template</h3><p>Modern portfolio with theme switcher</p><div class="project-tech"><span>HTML5</span><span>CSS3</span><span>JS</span></div><a href="#">Live Demo →</a></div>
+        <div class="project-card-full"><img src="https://placehold.co/600x400/1a1a2e/4f8fff?text=Project+4"><h3>Task Manager App</h3><p>Productivity app with drag & drop</p><div class="project-tech"><span>Vue.js</span><span>Firebase</span></div><a href="#">Live Demo →</a></div>
+    </section>
+    
+    <footer class="footer"><p>© 2026 AAYUSH. All rights reserved.</p><div class="social-links"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Twitter</a><a href="#">Instagram</a></div></footer>
+</div>
+
+<script src="10.js"></script>
+</body>
+</html>

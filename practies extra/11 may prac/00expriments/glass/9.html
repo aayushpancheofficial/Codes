@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AAYUSH — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* =============================================
+       CSS VARIABLES — THEME SYSTEM
+    ============================================= */
+    :root {
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+
+      /* Default: Space / Night */
+      --theme-accent:    #4f8fff;
+      --theme-accent-2:  #a78bfa;
+      --theme-glow:      rgba(79, 143, 255, 0.45);
+      --theme-glow-soft: rgba(79, 143, 255, 0.15);
+      --theme-border:    rgba(79, 143, 255, 0.35);
+      --theme-bg-glass:  rgba(8, 12, 30, 0.55);
+      --theme-text:      #e8eeff;
+      --theme-text-muted:#8b9bbf;
+      --navbar-shadow:   0 8px 48px rgba(79, 143, 255, 0.18), 0 2px 16px rgba(0,0,0,0.5);
+
+      --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ---- Rain Theme ---- */
+    body.rain {
+      --theme-accent:    #60b0ff;
+      --theme-accent-2:  #93c5fd;
+      --theme-glow:      rgba(96, 176, 255, 0.5);
+      --theme-glow-soft: rgba(96, 176, 255, 0.12);
+      --theme-border:    rgba(96, 176, 255, 0.4);
+      --theme-bg-glass:  rgba(4, 18, 40, 0.58);
+      --theme-text:      #ddeeff;
+      --theme-text-muted:#7aaac8;
+      --navbar-shadow:   0 8px 48px rgba(96, 176, 255, 0.22), 0 2px 16px rgba(0,0,0,0.55);
+    }
+
+    /* ---- Snow Theme ---- */
+    body.snow {
+      --theme-accent:    #c7deff;
+      --theme-accent-2:  #ffffff;
+      --theme-glow:      rgba(200, 220, 255, 0.55);
+      --theme-glow-soft: rgba(200, 220, 255, 0.12);
+      --theme-border:    rgba(200, 220, 255, 0.45);
+      --theme-bg-glass:  rgba(20, 30, 55, 0.50);
+      --theme-text:      #eef4ff;
+      --theme-text-muted:#a0b8d8;
+      --navbar-shadow:   0 8px 48px rgba(200, 220, 255, 0.22), 0 2px 16px rgba(0,0,0,0.45);
+    }
+
+    /* ---- Sunny Theme ---- */
+    body.sun {
+      --theme-accent:    #ffb347;
+      --theme-accent-2:  #ff7f00;
+      --theme-glow:      rgba(255, 160, 60, 0.55);
+      --theme-glow-soft: rgba(255, 160, 60, 0.14);
+      --theme-border:    rgba(255, 160, 60, 0.45);
+      --theme-bg-glass:  rgba(40, 18, 4, 0.50);
+      --theme-text:      #fff3e0;
+      --theme-text-muted:#c8986a;
+      --navbar-shadow:   0 8px 48px rgba(255, 160, 60, 0.28), 0 2px 16px rgba(0,0,0,0.5);
+    }
+    .bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover; /* full screen cover */
+    z-index: -1;       /* behind content */
+}
+
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: var(--font-body);
+      color: var(--theme-text);
+      overflow-x: hidden;
+    }
+
+    /* =============================================
+       BACKGROUND SYSTEM
+    ============================================= */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      transition: opacity var(--transition);
+    }
+
+    .bg-layer img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Overlay for readability */
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.30);
+      transition: background var(--transition);
+    }
+
+    body.sun .bg-layer::after { background: rgba(20, 6, 0, 0.25); }
+    body.snow .bg-layer::after { background: rgba(0, 10, 30, 0.30); }
+    body.rain .bg-layer::after { background: rgba(0, 8, 25, 0.32); }
+
+    /* Four bg layers, one per theme */
+    #bg-space { z-index: 1; opacity: 1; }
+    #bg-rain  { z-index: 1; opacity: 0; }
+    #bg-snow  { z-index: 1; opacity: 0; }
+    #bg-sun   { z-index: 1; opacity: 0; }
+
+    body.rain  #bg-space { opacity: 0; }
+    body.rain  #bg-rain  { opacity: 1; }
+    body.snow  #bg-space { opacity: 0; }
+    body.snow  #bg-snow  { opacity: 1; }
+    body.sun   #bg-space { opacity: 0; }
+    body.sun   #bg-sun   { opacity: 1; }
+
+    /* =============================================
+       RAIN PARTICLE EFFECT
+    ============================================= */
+    #rain-canvas, #snow-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    body.rain #rain-canvas { opacity: 1; }
+    body.snow #snow-canvas { opacity: 1; }
+
+    /* =============================================
+       PAGE LAYOUT
+    ============================================= */
+    .page-wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 24px 60px;
+    }
+
+    /* =============================================
+       NAVBAR
+    ============================================= */
+    .navbar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 68px;
+      border-radius: 20px;
+      background: var(--theme-bg-glass);
+      backdrop-filter: blur(28px) saturate(160%);
+      -webkit-backdrop-filter: blur(28px) saturate(160%);
+      border: 1px solid var(--theme-border);
+      box-shadow: var(--navbar-shadow),
+                  inset 0 1px 0 rgba(255,255,255,0.06);
+      transition:
+        background var(--transition),
+        border var(--transition),
+        box-shadow var(--transition);
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Glow halo on hover */
+    .navbar::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      background: transparent;
+      border: 1px solid var(--theme-border);
+      opacity: 0;
+      transition: opacity var(--transition), box-shadow var(--transition);
+      pointer-events: none;
+    }
+    .navbar:hover::before {
+      opacity: 1;
+      box-shadow: 0 0 24px var(--theme-glow);
+    }
+
+    /* ---- Logo ---- */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 34px; height: 34px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 100%; height: 100%;
+      filter: drop-shadow(0 0 8px var(--theme-glow));
+      transition: filter var(--transition);
+    }
+
+    .logo-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--theme-text);
+      transition: color var(--transition);
+    }
+
+    /* ---- Center Nav Menu ---- */
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--theme-text-muted);
+      transition: color 0.25s, background 0.25s;
+      white-space: nowrap;
+    }
+
+    .nav-link svg {
+      width: 16px; height: 16px;
+      opacity: 0.7;
+      transition: opacity 0.25s, filter 0.25s;
+      flex-shrink: 0;
+    }
+
+    /* Hover */
+    .nav-link:hover {
+      color: var(--theme-text);
+      background: var(--theme-glow-soft);
+    }
+    .nav-link:hover svg { opacity: 1; }
+
+    /* Active */
+    .nav-link.active {
+      color: var(--theme-accent);
+    }
+    .nav-link.active svg {
+      opacity: 1;
+      filter: drop-shadow(0 0 4px var(--theme-glow));
+    }
+
+    /* Active underline */
+    .nav-underline {
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 2.5px;
+      border-radius: 99px;
+      background: var(--theme-accent);
+      box-shadow: 0 0 8px var(--theme-glow);
+      transition: background var(--transition), box-shadow var(--transition);
+      pointer-events: none;
+    }
+
+    /* ---- Divider ---- */
+    .nav-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--theme-border);
+      margin: 0 8px;
+      transition: background var(--transition);
+    }
+
+    /* ---- Theme Switcher ---- */
+    .theme-switcher {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--theme-accent);
+      transition: background 0.25s, color var(--transition);
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover { background: var(--theme-glow-soft); }
+
+    .theme-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .theme-btn .chevron {
+      width: 12px; height: 12px;
+      opacity: 0.6;
+      transition: transform 0.25s;
+    }
+    .theme-btn.open .chevron { transform: rotate(180deg); }
+
+    /* Dropdown */
+    .theme-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 170px;
+      background: var(--theme-bg-glass);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid var(--theme-border);
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 18px var(--theme-glow-soft);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition:
+        opacity 0.25s,
+        visibility 0.25s,
+        transform 0.25s,
+        border var(--transition),
+        box-shadow var(--transition);
+      z-index: 100;
+    }
+
+    .theme-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--theme-text-muted);
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-option svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .theme-option:hover { background: var(--theme-glow-soft); color: var(--theme-text); }
+    .theme-option.selected { color: var(--theme-accent); }
+    .theme-option.selected svg {
+      filter: drop-shadow(0 0 4px var(--theme-glow));
+    }
+
+    /* =============================================
+       HERO CONTENT (demo)
+    ============================================= */
+    .hero {
+      margin-top: 120px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--theme-accent);
+      margin-bottom: 18px;
+      padding: 6px 16px;
+      border-radius: 99px;
+      background: var(--theme-glow-soft);
+      border: 1px solid var(--theme-border);
+      transition: color var(--transition), background var(--transition), border var(--transition);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--theme-text);
+      margin-bottom: 18px;
+      transition: color var(--transition);
+    }
+
+    .hero-title span {
+      color: var(--theme-accent);
+      text-shadow: 0 0 30px var(--theme-glow);
+      transition: color var(--transition), text-shadow var(--transition);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--theme-text-muted);
+      max-width: 420px;
+      margin: 0 auto 36px;
+      transition: color var(--transition);
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 12px;
+      background: var(--theme-accent);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      box-shadow: 0 4px 24px var(--theme-glow);
+      transition: background var(--transition), box-shadow var(--transition), transform 0.2s;
+    }
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px var(--theme-glow);
+    }
+
+    /* =============================================
+       MOBILE RESPONSIVE
+    ============================================= */
+    @media (max-width: 720px) {
+      .page-wrapper { padding: 16px 14px 40px; }
+
+      .navbar {
+        height: auto;
+        padding: 0;
+        flex-direction: column;
+        border-radius: 16px;
+        gap: 0;
+      }
+
+      .navbar-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 18px;
+      }
+
+      .nav-menu {
+        width: 100%;
+        padding: 8px 14px 14px;
+        gap: 2px;
+        flex-wrap: wrap;
+        justify-content: center;
+        border-top: 1px solid var(--theme-border);
+      }
+
+      .nav-divider { display: none; }
+
+      .theme-dropdown {
+        right: auto;
+        left: 0;
+      }
+    }
+
+    @media (min-width: 721px) {
+      .navbar-top { display: contents; }
+    }
+    /* hide video by default */
+#bg-rain-video {
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.6s;
+}
+
+/* show only in rain theme */
+body.rain #bg-rain-video {
+  opacity: 1;
+}
+
+/* hide image rain when video active */
+body.rain #bg-rain {
+  opacity: 0;
+}
+  </style>
+</head>
+<body>
+
+  <!-- ============ BACKGROUND LAYERS ============ -->
+  <!-- Space (default) -->
+  <div class="bg-layer" id="bg-space">
+    <img src="https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1600&q=80" alt="space background"/>
+  </div>
+  <!-- Rain -->
+  <div class="bg-layer" id="bg-rain">
+    <img src="https://images.unsplash.com/photo-1438449805896-28a666819a20?w=1600&q=80" alt="rain background"/>
+  </div>
+  <!-- Snow -->
+  <div class="bg-layer" id="bg-snow">
+    <img src="https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=1600&q=80" alt="snow background"/>
+  </div>
+  <!-- Sun -->
+  <div class="bg-layer" id="bg-sun">
+    <img src="https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?w=1600&q=80" alt="sunny background"/>
+  </div>
+  <!-- my  -->
+ <div class="bg-layer" id="bg-rain-video">
+  <video autoplay muted loop playsinline class="bg-video">
+    <source src="/videos/your_video.mp4" type="video/mp4">
+  </video>
+</div>
+
+  <!-- Particle canvases -->
+  <canvas id="rain-canvas"></canvas>
+  <canvas id="snow-canvas"></canvas>
+
+  <!-- ============ PAGE ============ -->
+  <div class="page-wrapper">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+
+      <!-- On mobile, logo + theme go in top bar; on desktop, display:contents -->
+      <div class="navbar-top">
+
+        <!-- LEFT: Logo -->
+        <a href="#" class="nav-logo" aria-label="Aayush Home">
+          <div class="logo-icon">
+            <!-- Custom "A" mark — angular / futuristic -->
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="18,3 33,30 3,30" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linejoin="round" style="color: var(--theme-accent); stroke: var(--theme-accent);"/>
+              <line x1="9" y1="22" x2="27" y2="22" stroke="currentColor" stroke-width="2"
+                style="color: var(--theme-accent); stroke: var(--theme-accent);"/>
+            </svg>
+          </div>
+          <span class="logo-name">AAYUSH</span>
+        </a>
+
+        <!-- RIGHT: Theme switcher (always in top area) -->
+        <div class="theme-switcher" id="themeSwitcher">
+          <button class="theme-btn" id="themeBtn" aria-haspopup="true" aria-expanded="false">
+            <!-- Icon swaps per theme via JS -->
+            <span id="themeIcon"></span>
+            <span id="themeLabel">Theme</span>
+            <svg class="chevron" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="theme-dropdown" id="themeDropdown" role="menu">
+            <div class="theme-option" data-theme="space" role="menuitem" tabindex="0">
+              <!-- Night/Space icon -->
+              <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+              </svg>
+              Night Mode
+            </div>
+            <div class="theme-option" data-theme="rain" role="menuitem" tabindex="0">
+              <!-- Cloud rain icon -->
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 16v1M8 16v2M11 16v1M14 16v2" stroke-linecap="round"/>
+                <path d="M4 12a4 4 0 014-4h.5A5.5 5.5 0 1116 13H4z" stroke-linejoin="round"/>
+              </svg>
+              Rain Mode
+            </div>
+            <div class="theme-option" data-theme="snow" role="menuitem" tabindex="0">
+              <!-- Snowflake icon -->
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+                <line x1="10" y1="2" x2="10" y2="18" stroke-linecap="round"/>
+                <line x1="2" y1="10" x2="18" y2="10" stroke-linecap="round"/>
+                <line x1="4.22" y1="4.22" x2="15.78" y2="15.78" stroke-linecap="round"/>
+                <line x1="15.78" y1="4.22" x2="4.22" y2="15.78" stroke-linecap="round"/>
+              </svg>
+              Snow Mode
+            </div>
+            <div class="theme-option" data-theme="sun" role="menuitem" tabindex="0">
+              <!-- Sun icon -->
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="3.5"/>
+                <line x1="10" y1="2" x2="10" y2="4" stroke-linecap="round"/>
+                <line x1="10" y1="16" x2="10" y2="18" stroke-linecap="round"/>
+                <line x1="2" y1="10" x2="4" y2="10" stroke-linecap="round"/>
+                <line x1="16" y1="10" x2="18" y2="10" stroke-linecap="round"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke-linecap="round"/>
+                <line x1="14.36" y1="14.36" x2="15.78" y2="15.78" stroke-linecap="round"/>
+                <line x1="15.78" y1="4.22" x2="14.36" y2="5.64" stroke-linecap="round"/>
+                <line x1="5.64" y1="14.36" x2="4.22" y2="15.78" stroke-linecap="round"/>
+              </svg>
+              Sunny Mode
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /navbar-top -->
+
+      <!-- CENTER: Nav menu -->
+      <ul class="nav-menu" role="list">
+        <li class="nav-item">
+          <a href="#" class="nav-link active" data-page="home">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke-linejoin="round"/>
+              <path d="M7 18v-5h6v5" stroke-linejoin="round"/>
+            </svg>
+            Home
+            <span class="nav-underline"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-page="work">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="7" width="16" height="11" rx="2" stroke-linejoin="round"/>
+              <path d="M13 7V5a2 2 0 00-2-2H9a2 2 0 00-2 2v2" stroke-linejoin="round"/>
+            </svg>
+            Work
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-page="blog">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-9 9L4 17l1.586-3.414 7.998-8z" stroke-linejoin="round"/>
+            </svg>
+            Blog
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-page="resume">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" stroke-linejoin="round"/>
+              <line x1="7" y1="7" x2="13" y2="7" stroke-linecap="round"/>
+              <line x1="7" y1="10" x2="13" y2="10" stroke-linecap="round"/>
+              <line x1="7" y1="13" x2="10" y2="13" stroke-linecap="round"/>
+            </svg>
+            Resume
+          </a>
+        </li>
+
+        <!-- Divider before theme (desktop) -->
+        <li class="nav-divider" role="separator" aria-hidden="true"></li>
+
+      </ul>
+
+    </nav>
+    <!-- /NAVBAR -->
+
+    <!-- ===== HERO (demo content) ===== -->
+    <section class="hero" aria-label="Hero section">
+      <p class="hero-tag">Available for freelance</p>
+      <h1 class="hero-title">
+        Hi, I'm <span>Aayush</span><br/>
+        I design &amp; build things
+      </h1>
+      <p class="hero-sub">
+        A creative developer crafting memorable digital experiences — blending sharp design with clean code.
+      </p>
+      <a href="#" class="hero-cta">
+        View my work
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </section>
+
+  </div><!-- /page-wrapper -->
+
+
+  <script>
+  /* =============================================
+     THEME SYSTEM
+  ============================================= */
+  const THEMES = {
+    space: {
+      label: 'Night Mode',
+      icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>`
+    },
+    rain: {
+      label: 'Rain Mode',
+      icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 16v1M8 16v2M11 16v1M14 16v2" stroke-linecap="round"/>
+        <path d="M4 12a4 4 0 014-4h.5A5.5 5.5 0 1116 13H4z" stroke-linejoin="round"/></svg>`
+    },
+    snow: {
+      label: 'Snow Mode',
+      icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="2" x2="10" y2="18" stroke-linecap="round"/>
+        <line x1="2" y1="10" x2="18" y2="10" stroke-linecap="round"/>
+        <line x1="4.22" y1="4.22" x2="15.78" y2="15.78" stroke-linecap="round"/>
+        <line x1="15.78" y1="4.22" x2="4.22" y2="15.78" stroke-linecap="round"/></svg>`
+    },
+    sun: {
+      label: 'Sunny Mode',
+      icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="3.5"/>
+        <line x1="10" y1="2" x2="10" y2="4" stroke-linecap="round"/>
+        <line x1="10" y1="16" x2="10" y2="18" stroke-linecap="round"/>
+        <line x1="2" y1="10" x2="4" y2="10" stroke-linecap="round"/>
+        <line x1="16" y1="10" x2="18" y2="10" stroke-linecap="round"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke-linecap="round"/>
+        <line x1="14.36" y1="14.36" x2="15.78" y2="15.78" stroke-linecap="round"/>
+        <line x1="15.78" y1="4.22" x2="14.36" y2="5.64" stroke-linecap="round"/>
+        <line x1="5.64" y1="14.36" x2="4.22" y2="15.78" stroke-linecap="round"/></svg>`
+    }
+  };
+
+  const body        = document.body;
+  const themeBtn    = document.getElementById('themeBtn');
+  const themeIcon   = document.getElementById('themeIcon');
+  const themeLabel  = document.getElementById('themeLabel');
+  const dropdown    = document.getElementById('themeDropdown');
+  const options     = document.querySelectorAll('.theme-option');
+
+  let currentTheme  = localStorage.getItem('aayush-theme') || 'space';
+
+  /* Apply a theme */
+  function applyTheme(name) {
+    // Remove all theme classes
+    body.classList.remove('rain', 'snow', 'sun');
+    if (name !== 'space') body.classList.add(name);
+
+    currentTheme = name;
+    localStorage.setItem('aayush-theme', name);
+
+    // Update button
+    themeIcon.innerHTML  = THEMES[name].icon;
+    themeLabel.innerHTML = THEMES[name].label;
+
+    // Update selected state in dropdown
+    options.forEach(opt => {
+      opt.classList.toggle('selected', opt.dataset.theme === name);
+    });
+  }
+
+  /* Toggle dropdown */
+  function toggleDropdown(force) {
+    const isOpen = dropdown.classList.contains('open');
+    const open   = force !== undefined ? force : !isOpen;
+    dropdown.classList.toggle('open', open);
+    themeBtn.classList.toggle('open', open);
+    themeBtn.setAttribute('aria-expanded', open);
+  }
+
+  themeBtn.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(); });
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      applyTheme(opt.dataset.theme);
+      toggleDropdown(false);
+    });
+    opt.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        applyTheme(opt.dataset.theme);
+        toggleDropdown(false);
+      }
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', () => toggleDropdown(false));
+
+  // Init
+  applyTheme(currentTheme);
+
+
+  /* =============================================
+     NAV MENU — ACTIVE LINK
+  ============================================= */
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      navLinks.forEach(l => {
+        l.classList.remove('active');
+        const u = l.querySelector('.nav-underline');
+        if (u) u.remove();
+      });
+      link.classList.add('active');
+      const underline = document.createElement('span');
+      underline.className = 'nav-underline';
+      link.appendChild(underline);
+    });
+  });
+
+
+  /* =============================================
+     PARTICLE EFFECTS — RAIN
+  ============================================= */
+  (function setupRain() {
+    const canvas = document.getElementById('rain-canvas');
+    const ctx    = canvas.getContext('2d');
+    let drops    = [];
+    let animId   = null;
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initDrops() {
+      drops = [];
+      const count = Math.floor(canvas.width / 6);
+      for (let i = 0; i < count; i++) {
+        drops.push({
+          x:     Math.random() * canvas.width,
+          y:     Math.random() * canvas.height,
+          len:   Math.random() * 18 + 8,
+          speed: Math.random() * 9 + 6,
+          opacity: Math.random() * 0.35 + 0.1
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drops.forEach(d => {
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - 1, d.y + d.len);
+        ctx.strokeStyle = `rgba(130,200,255,${d.opacity})`;
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+        d.y += d.speed;
+        if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
+      });
+      animId = requestAnimationFrame(draw);
+    }
+
+    function start() { if (!animId) { initDrops(); draw(); } }
+    function stop()  { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+
+    window.addEventListener('resize', () => { resize(); if (animId) initDrops(); });
+    resize();
+
+    // Observe body class
+    const obs = new MutationObserver(() => {
+      body.classList.contains('rain') ? start() : stop();
+    });
+    obs.observe(body, { attributes: true, attributeFilter: ['class'] });
+
+    if (body.classList.contains('rain')) start();
+  })();
+
+
+  /* =============================================
+     PARTICLE EFFECTS — SNOW
+  ============================================= */
+  (function setupSnow() {
+    const canvas = document.getElementById('snow-canvas');
+    const ctx    = canvas.getContext('2d');
+    let flakes   = [];
+    let animId   = null;
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initFlakes() {
+      flakes = [];
+      const count = Math.floor(canvas.width / 10);
+      for (let i = 0; i < count; i++) {
+        flakes.push({
+          x:       Math.random() * canvas.width,
+          y:       Math.random() * canvas.height,
+          r:       Math.random() * 2.5 + 0.8,
+          speed:   Math.random() * 1.5 + 0.4,
+          drift:   (Math.random() - 0.5) * 0.4,
+          opacity: Math.random() * 0.5 + 0.15
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      flakes.forEach(f => {
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,235,255,${f.opacity})`;
+        ctx.fill();
+        f.y += f.speed;
+        f.x += f.drift;
+        if (f.y > canvas.height) { f.y = -4; f.x = Math.random() * canvas.width; }
+        if (f.x > canvas.width)  f.x = 0;
+        if (f.x < 0)             f.x = canvas.width;
+      });
+      animId = requestAnimationFrame(draw);
+    }
+
+    function start() { if (!animId) { initFlakes(); draw(); } }
+    function stop()  { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+
+    window.addEventListener('resize', () => { resize(); if (animId) initFlakes(); });
+    resize();
+
+    const obs = new MutationObserver(() => {
+      body.classList.contains('snow') ? start() : stop();
+    });
+    obs.observe(body, { attributes: true, attributeFilter: ['class'] });
+
+    if (body.classList.contains('snow')) start();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Aayush — Dynamic Creative Portfolio</title>
+  <!-- Google Fonts + Phosphor Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ----- CSS VARIABLES (Theme system preserved) ----- */
+    :root {
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --theme-accent: #4f8fff;
+      --theme-accent-2: #a78bfa;
+      --theme-glow: rgba(79, 143, 255, 0.45);
+      --theme-glow-soft: rgba(79, 143, 255, 0.2);
+      --theme-border: rgba(79, 143, 255, 0.35);
+      --theme-bg-glass: rgba(8, 12, 30, 0.65);
+      --theme-text: #e8eeff;
+      --theme-text-muted: #8b9bbf;
+      --transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    body.rain { --theme-accent: #60b0ff; --theme-accent-2: #93c5fd; --theme-glow: rgba(96,176,255,0.5); --theme-border: rgba(96,176,255,0.4); --theme-bg-glass: rgba(4,18,40,0.68); --theme-text: #ddeeff; --theme-text-muted: #7aaac8; }
+    body.snow { --theme-accent: #c7deff; --theme-accent-2: #ffffff; --theme-glow: rgba(200,220,255,0.55); --theme-border: rgba(200,220,255,0.45); --theme-bg-glass: rgba(20,30,55,0.6); --theme-text: #eef4ff; --theme-text-muted:#a0b8d8; }
+    body.sun { --theme-accent: #ffb347; --theme-accent-2: #ff7f00; --theme-glow: rgba(255,160,60,0.55); --theme-border: rgba(255,160,60,0.45); --theme-bg-glass: rgba(40,18,4,0.65); --theme-text: #fff3e0; --theme-text-muted:#e0b080; }
+    body.forest { --theme-accent: #4caf50; --theme-accent-2: #81c784; --theme-glow: rgba(76,175,80,0.5); --theme-border: rgba(76,175,80,0.4); --theme-bg-glass: rgba(10,30,15,0.65); --theme-text: #e8f5e9; --theme-text-muted:#b9f6ca; }
+    body.aurora { --theme-accent: #e040fb; --theme-accent-2: #ce93d8; --theme-glow: rgba(224,64,251,0.5); --theme-border: rgba(224,64,251,0.4); --theme-bg-glass: rgba(30,10,40,0.68); --theme-text: #f3e5f5; --theme-text-muted:#e1bee7; }
+
+    /* ----- BACKGROUND SYSTEM (lightweight, preserves theme switching) ----- */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+    .bg-layer img, .bg-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      pointer-events: none;
+    }
+    #bg-space { z-index: 1; opacity: 1; }
+    #bg-rain, #bg-snow, #bg-sun, #bg-forest, #bg-aurora { z-index: 1; opacity: 0; }
+    body.rain #bg-space, body.snow #bg-space, body.sun #bg-space, body.forest #bg-space, body.aurora #bg-space { opacity: 0; }
+    body.rain #bg-rain { opacity: 1; }
+    body.snow #bg-snow { opacity: 1; }
+    body.sun #bg-sun { opacity: 1; }
+    body.forest #bg-forest { opacity: 1; }
+    body.aurora #bg-aurora { opacity: 1; }
+    #rain-canvas, #snow-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    body.rain #rain-canvas { opacity: 1; }
+    body.snow #snow-canvas { opacity: 1; }
+
+    /* BASE */
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      font-family: var(--font-body);
+      background: #0a0c12;
+      color: var(--theme-text);
+      overflow-x: hidden;
+    }
+    .page-wrapper {
+      position: relative;
+      z-index: 15;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px 60px;
+    }
+
+    /* ========== GLASS NAVBAR — SINGLE LINE MOBILE FIX (always visible) ========== */
+    .glass-navbar {
+      width: 100%;
+      background: var(--theme-bg-glass);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 32px;
+      border: 1px solid var(--theme-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      gap: 8px;
+      flex-wrap: nowrap;   /* CRUCIAL: no wrap on mobile */
+      transition: all var(--transition);
+      box-shadow: 0 10px 30px -8px rgba(0,0,0,0.3);
+      margin-bottom: 40px;
+    }
+
+    /* Left Logo */
+    .nav-left {
+      flex-shrink: 0;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      color: var(--theme-accent);
+      filter: drop-shadow(0 0 6px var(--theme-glow));
+    }
+    .logo-icon svg { width: 100%; height: 100%; fill: currentColor; }
+    .brand-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      color: var(--theme-text);
+    }
+
+    /* Center links (HOME, WORK, BLOG, RESUME) - always flex row */
+    .nav-center {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 1;
+      flex-wrap: nowrap;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 40px;
+      color: var(--theme-text-muted);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-link i { font-size: 1.1rem; }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255,255,255,0.1);
+      color: var(--theme-accent);
+    }
+    .divider {
+      width: 1px;
+      height: 24px;
+      background: var(--theme-border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+    /* Right theme switcher */
+    .nav-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .theme-switcher { position: relative; cursor: pointer; }
+    .current-theme {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      padding: 6px 12px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--theme-text);
+    }
+    .current-theme #themeIcon i { font-size: 1rem; }
+    .chevron { font-size: 0.7rem; transition: transform 0.2s; }
+    .theme-switcher.open .chevron { transform: rotate(180deg); }
+    .theme-dropdown {
+      position: absolute;
+      top: 48px;
+      right: 0;
+      background: var(--theme-bg-glass);
+      backdrop-filter: blur(24px);
+      border-radius: 20px;
+      padding: 8px;
+      width: 180px;
+      border: 1px solid var(--theme-border);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: 0.2s;
+      z-index: 200;
+    }
+    .theme-switcher.open .theme-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .theme-option {
+      padding: 10px 14px;
+      display: flex;
+      gap: 12px;
+      border-radius: 14px;
+      color: var(--theme-text-muted);
+      font-size: 0.8rem;
+    }
+    .theme-option:hover, .theme-option.selected { background: rgba(255,255,255,0.1); color: var(--theme-accent); }
+    .mobile-menu-btn { display: none; } /* hidden fully because we show all items */
+
+    /* PROFILE CARD (CIRCLE IMAGE + SIDE INFO) */
+    .profile-showcase {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin: 30px 0 40px;
+      background: var(--theme-bg-glass);
+      backdrop-filter: blur(12px);
+      border-radius: 58px;
+      padding: 28px 32px;
+      border: 1px solid var(--theme-border);
+      transition: all 0.3s;
+    }
+    .avatar-circle {
+      flex-shrink: 0;
+      width: 140px;
+      height: 140px;
+      background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 35px -12px var(--theme-glow);
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+    .avatar-inner {
+      width: 130px;
+      height: 130px;
+      background: #1a1e2c;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f1222;
+    }
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* fallback if image missing */
+    .avatar-fallback {
+      font-size: 3.2rem;
+      font-weight: bold;
+      color: var(--theme-accent);
+      font-family: var(--font-display);
+    }
+    .profile-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    .profile-info h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--font-display);
+      background: linear-gradient(120deg, var(--theme-text), var(--theme-accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+    }
+    .dynamic-role {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .role-label {
+      color: var(--theme-text-muted);
+    }
+    .rotating-word {
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--theme-accent);
+      background: var(--theme-glow-soft);
+      padding: 2px 12px;
+      border-radius: 40px;
+      display: inline-block;
+      transition: 0.2s;
+      text-shadow: 0 0 6px var(--theme-glow);
+    }
+    .cursor-blink {
+      display: inline-block;
+      width: 3px;
+      height: 1.5rem;
+      background: var(--theme-accent);
+      margin-left: 6px;
+      vertical-align: middle;
+      border-radius: 2px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{ opacity: 1; } 50%{ opacity: 0; } }
+
+    .social-links {
+      display: flex;
+      gap: 20px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 18px;
+      border-radius: 60px;
+      text-decoration: none;
+      color: var(--theme-text);
+      font-weight: 500;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+    .social-icon i {
+      font-size: 1.3rem;
+      color: var(--theme-accent);
+    }
+    .social-icon:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-3px);
+      border-color: var(--theme-border);
+    }
+
+    /* Hero tagline adjustment */
+    .hero {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .hero-tag {
+      background: var(--theme-glow-soft);
+      display: inline-block;
+      padding: 6px 20px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: var(--theme-accent);
+    }
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      margin: 20px 0 16px;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .btn-work {
+      display: inline-flex;
+      background: var(--theme-accent);
+      padding: 12px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 700;
+      color: white;
+      gap: 8px;
+      margin-top: 16px;
+      transition: 0.3s;
+    }
+    .btn-work:hover { transform: scale(1.02); box-shadow: 0 8px 20px var(--theme-glow); }
+
+    /* RESPONSIVE: mobile single row already handled (flex-wrap: nowrap) */
+    @media (max-width: 780px) {
+      .page-wrapper { padding: 16px; }
+      .glass-navbar { padding: 6px 12px; gap: 6px; }
+      .nav-link { padding: 6px 8px; font-size: 0.7rem; }
+      .nav-link i { font-size: 0.9rem; }
+      .brand-text { font-size: 0.85rem; }
+      .current-theme { padding: 4px 10px; font-size: 0.7rem; }
+      .profile-showcase { flex-direction: column; text-align: center; padding: 24px; border-radius: 40px; }
+      .profile-info h2 { font-size: 1.8rem; }
+      .rotating-word { font-size: 1.2rem; }
+      .social-links { justify-content: center; }
+    }
+    @media (max-width: 550px) {
+      .nav-link span:not(i) { display: none; }  /* optional: only icons visible, but still text? better keep icons+short text */
+      .nav-link { padding: 6px 6px; gap: 2px; }
+      .nav-link i { margin-right: 0; }
+      /* but we keep text on bigger mobile, for extremely narrow show only icons but preserve usability */
+    }
+    /* ensure navbar elements never wrap */
+    @media (max-width: 640px) {
+      .nav-link span:first-of-type { display: inline-block; font-size: 0.65rem; }
+      .nav-link { padding: 5px 6px; }
+      .current-theme #themeLabel { display: inline-block; font-size: 0.7rem; }
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 0.7rem;
+      color: var(--theme-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers (themes) -->
+  <div class="bg-layer" id="bg-space"><img src="https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1600&q=80" alt="space"/></div>
+  <div class="bg-layer" id="bg-rain"><img src="https://images.unsplash.com/photo-1438449805896-28a666819a20?w=1600&q=80" alt="rain"/></div>
+  <div class="bg-layer" id="bg-snow"><img src="https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=1600&q=80" alt="snow"/></div>
+  <div class="bg-layer" id="bg-sun"><img src="https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?w=1600&q=80" alt="sun"/></div>
+  <div class="bg-layer" id="bg-forest"><img src="https://images.unsplash.com/photo-1441974231531-c622288db8b4?w=1600&q=80" alt="forest"/></div>
+  <div class="bg-layer" id="bg-aurora"><img src="https://images.unsplash.com/photo-1536241451091-3910bc043070?w=1600&q=80" alt="aurora"/></div>
+  <canvas id="rain-canvas"></canvas>
+  <canvas id="snow-canvas"></canvas>
+
+  <div class="page-wrapper">
+    <!-- NAVBAR (mobile: single line, home, work, blog, resume all visible) -->
+    <nav class="glass-navbar">
+      <div class="nav-left">
+        <a href="#" class="nav-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 32 32"><path d="M16 2L2 28H9.5L16 15.5L22.5 28H30L16 2Z" fill="currentColor"/><path d="M16 15.5L9.5 28H2L16 2V15.5Z" fill="rgba(0,0,0,0.2)"/></svg>
+          </div>
+          <span class="brand-text">AAYUSH</span>
+        </a>
+      </div>
+
+      <!-- CENTER LINKS - always displayed inline on mobile -->
+      <div class="nav-center">
+        <a href="#" class="nav-link active"><i class="ph ph-house"></i><span>Home</span></a>
+        <a href="#" class="nav-link"><i class="ph ph-briefcase"></i><span>Work</span></a>
+        <a href="#" class="nav-link"><i class="ph ph-pen-nib"></i><span>Blog</span></a>
+        <a href="#" class="nav-link"><i class="ph ph-file-text"></i><span>Resume</span></a>
+      </div>
+      <div class="divider"></div>
+      <div class="nav-right">
+        <div class="theme-switcher" id="themeSwitcher">
+          <div class="current-theme" id="themeBtn">
+            <span id="themeIcon"><i class="ph ph-planet"></i></span>
+            <span id="themeLabel">Theme</span>
+            <i class="ph ph-caret-down chevron"></i>
+          </div>
+          <div class="theme-dropdown" id="themeDropdown">
+            <div class="theme-option" data-theme="space"><i class="ph ph-planet"></i> Night Mode</div>
+            <div class="theme-option" data-theme="rain"><i class="ph ph-cloud-rain"></i> Rain Mode</div>
+            <div class="theme-option" data-theme="snow"><i class="ph ph-snowflake"></i> Snow Mode</div>
+            <div class="theme-option" data-theme="sun"><i class="ph ph-sun"></i> Sunny Mode</div>
+            <div class="theme-option" data-theme="forest"><i class="ph ph-tree-evergreen"></i> Forest Mode</div>
+            <div class="theme-option" data-theme="aurora"><i class="ph ph-sparkle"></i> Aurora Mode</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- PROFILE SECTION: Circle image + name + social links (exactly as asked) -->
+    <div class="profile-showcase">
+      <div class="avatar-circle">
+        <div class="avatar-inner">
+          <!-- Placeholder image using Unsplash portrait (professional). Replace with your actual image URL -->
+          <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=180&h=180&fit=crop" alt="Aayush profile" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=avatar-fallback>👨‍💻</div>';">
+        </div>
+      </div>
+      <div class="profile-info">
+        <h2>Aayush Sharma</h2>
+        <div class="dynamic-role">
+          <span class="role-label">✨ I'm a</span>
+          <span class="rotating-word" id="changingRole">Developer</span>
+          <span class="cursor-blink"></span>
+        </div>
+        <p style="color: var(--theme-text-muted); margin-bottom: 8px;">Creative full-stack developer & UI/UX enthusiast. Crafting immersive web experiences.</p>
+        <div class="social-links">
+          <a href="#" class="social-icon"><i class="ph ph-github-logo"></i> GitHub</a>
+          <a href="#" class="social-icon"><i class="ph ph-linkedin-logo"></i> LinkedIn</a>
+          <a href="#" class="social-icon"><i class="ph ph-instagram-logo"></i> Instagram</a>
+          <a href="#" class="social-icon"><i class="ph ph-twitter-logo"></i> Twitter</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero / CTA section -->
+    <section class="hero">
+      <p class="hero-tag">✦ Available for freelance & collaborations ✦</p>
+      <h1 class="hero-title">I build <span>digital magic</span><br />with clean code & soul</h1>
+      <a href="#" class="btn-work">View my work →</a>
+    </section>
+    <div class="footer-note">⚡ Interactive themes • Dynamic role rotator • Always visible navbar</div>
+  </div>
+
+  <script>
+    // ----- THEME SYSTEM -----
+    const THEMES = {
+      space: { label: 'Night Mode', icon: '<i class="ph ph-planet"></i>' },
+      rain: { label: 'Rain Mode', icon: '<i class="ph ph-cloud-rain"></i>' },
+      snow: { label: 'Snow Mode', icon: '<i class="ph ph-snowflake"></i>' },
+      sun: { label: 'Sunny Mode', icon: '<i class="ph ph-sun"></i>' },
+      forest: { label: 'Forest Mode', icon: '<i class="ph ph-tree-evergreen"></i>' },
+      aurora: { label: 'Aurora Mode', icon: '<i class="ph ph-sparkle"></i>' }
+    };
+    const bodyEl = document.body;
+    const themeIconSpan = document.getElementById('themeIcon');
+    const themeLabelSpan = document.getElementById('themeLabel');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const themeSwitcherDiv = document.getElementById('themeSwitcher');
+    const themeBtnDiv = document.getElementById('themeBtn');
+
+    let currentTheme = localStorage.getItem('aayush_theme') || 'space';
+    function applyTheme(themeName) {
+      bodyEl.classList.remove('rain', 'snow', 'sun', 'forest', 'aurora');
+      if (themeName !== 'space') bodyEl.classList.add(themeName);
+      localStorage.setItem('aayush_theme', themeName);
+      themeIconSpan.innerHTML = THEMES[themeName].icon;
+      themeLabelSpan.innerHTML = THEMES[themeName].label;
+      themeOptions.forEach(opt => opt.classList.toggle('selected', opt.dataset.theme === themeName));
+    }
+    applyTheme(currentTheme);
+    function toggleDropdown(open) {
+      if (open !== undefined) themeSwitcherDiv.classList.toggle('open', open);
+      else themeSwitcherDiv.classList.toggle('open');
+    }
+    themeBtnDiv.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(); });
+    themeOptions.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyTheme(opt.dataset.theme);
+        toggleDropdown(false);
+      });
+    });
+    document.addEventListener('click', () => toggleDropdown(false));
+
+    // ----- DYNAMIC ROTATING WORDS (Freelance / Student / Developer / Creative Coder) -----
+    const roles = ["Freelance", "Student", "Developer", "Creative Coder", "UI Designer"];
+    let roleIdx = 0;
+    const roleSpan = document.getElementById("changingRole");
+    function rotateRole() {
+      roleIdx = (roleIdx + 1) % roles.length;
+      roleSpan.style.opacity = '0';
+      setTimeout(() => {
+        roleSpan.innerText = roles[roleIdx];
+        roleSpan.style.opacity = '1';
+      }, 150);
+    }
+    setInterval(rotateRole, 2700);
+    // initial
+    roleSpan.innerText = "Developer";
+
+    // ----- Nav active state (simple) -----
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    // ----- Rain and Snow Canvas (preserving same logic)-----
+    (function initRain() {
+      const canvas = document.getElementById('rain-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let drops = [], animId = null;
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      function initDrops() {
+        drops = [];
+        for (let i = 0; i < (canvas.width / 6); i++) {
+          drops.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, len: Math.random() * 18 + 8, speed: Math.random() * 9 + 6, opacity: Math.random() * 0.35 + 0.1 });
+        }
+      }
+      function drawRain() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drops.forEach(d => {
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(d.x - 1, d.y + d.len);
+          ctx.strokeStyle = `rgba(130,200,255,${d.opacity})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          d.y += d.speed;
+          if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
+        });
+        animId = requestAnimationFrame(drawRain);
+      }
+      function startRain() { if (!animId) { resize(); initDrops(); drawRain(); } }
+      function stopRain() { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+      window.addEventListener('resize', () => { if (animId) { resize(); initDrops(); } });
+      const rainObserver = new MutationObserver(() => bodyEl.classList.contains('rain') ? startRain() : stopRain());
+      rainObserver.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+      if (bodyEl.classList.contains('rain')) startRain();
+    })();
+
+    (function initSnow() {
+      const canvas = document.getElementById('snow-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let flakes = [], animId = null;
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      function initFlakes() {
+        flakes = [];
+        for (let i = 0; i < (canvas.width / 10); i++) {
+          flakes.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 2.5 + 0.8, speed: Math.random() * 1.5 + 0.4, drift: (Math.random() - 0.5) * 0.4, opacity: Math.random() * 0.5 + 0.15 });
+        }
+      }
+      function drawSnow() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        flakes.forEach(f => {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(220,235,255,${f.opacity})`;
+          ctx.fill();
+          f.y += f.speed;
+          f.x += f.drift;
+          if (f.y > canvas.height) { f.y = -4; f.x = Math.random() * canvas.width; }
+          if (f.x > canvas.width) f.x = 0;
+          if (f.x < 0) f.x = canvas.width;
+        });
+        animId = requestAnimationFrame(drawSnow);
+      }
+      function startSnow() { if (!animId) { resize(); initFlakes(); drawSnow(); } }
+      function stopSnow() { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+      window.addEventListener('resize', () => { if (animId) { resize(); initFlakes(); } });
+      const snowObserver = new MutationObserver(() => bodyEl.classList.contains('snow') ? startSnow() : stopSnow());
+      snowObserver.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+      if (bodyEl.classList.contains('snow')) startSnow();
+    })();
+
+    // ensure mobile menu button is hidden, navbar stays single line
+    const anyMobileBtn = document.querySelector('.mobile-menu-btn');
+    if(anyMobileBtn) anyMobileBtn.style.display = 'none';
+  </script>
+</body>
+</html>

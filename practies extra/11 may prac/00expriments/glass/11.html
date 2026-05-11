@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AAYUSH — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* =============================================
+       CSS VARIABLES — THEME SYSTEM
+    ============================================= */
+    :root {
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+
+      /* Default: Space / Night */
+      --theme-accent:    #4f8fff;
+      --theme-accent-2:  #a78bfa;
+      --theme-glow:      rgba(79, 143, 255, 0.45);
+      --theme-glow-soft: rgba(79, 143, 255, 0.15);
+      --theme-border:    rgba(79, 143, 255, 0.35);
+      --theme-bg-glass:  rgba(8, 12, 30, 0.55);
+      --theme-text:      #e8eeff;
+      --theme-text-muted:#8b9bbf;
+      --navbar-shadow:   0 8px 48px rgba(79, 143, 255, 0.18), 0 2px 16px rgba(0,0,0,0.5);
+      --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ---- Rain Theme ---- */
+    body.rain {
+      --theme-accent:    #60b0ff;
+      --theme-accent-2:  #93c5fd;
+      --theme-glow:      rgba(96, 176, 255, 0.5);
+      --theme-glow-soft: rgba(96, 176, 255, 0.12);
+      --theme-border:    rgba(96, 176, 255, 0.4);
+      --theme-bg-glass:  rgba(4, 18, 40, 0.58);
+      --theme-text:      #ddeeff;
+      --theme-text-muted:#7aaac8;
+      --navbar-shadow:   0 8px 48px rgba(96, 176, 255, 0.22), 0 2px 16px rgba(0,0,0,0.55);
+    }
+
+    /* ---- Snow Theme ---- */
+    body.snow {
+      --theme-accent:    #c7deff;
+      --theme-accent-2:  #ffffff;
+      --theme-glow:      rgba(200, 220, 255, 0.55);
+      --theme-glow-soft: rgba(200, 220, 255, 0.12);
+      --theme-border:    rgba(200, 220, 255, 0.45);
+      --theme-bg-glass:  rgba(20, 30, 55, 0.50);
+      --theme-text:      #eef4ff;
+      --theme-text-muted:#a0b8d8;
+      --navbar-shadow:   0 8px 48px rgba(200, 220, 255, 0.22), 0 2px 16px rgba(0,0,0,0.45);
+    }
+
+    /* ---- Sunny Theme ---- */
+    body.sun {
+      --theme-accent:    #ffb347;
+      --theme-accent-2:  #ff7f00;
+      --theme-glow:      rgba(255, 160, 60, 0.55);
+      --theme-glow-soft: rgba(255, 160, 60, 0.14);
+      --theme-border:    rgba(255, 160, 60, 0.45);
+      --theme-bg-glass:  rgba(40, 18, 4, 0.50);
+      --theme-text:      #fff3e0;
+      --theme-text-muted:#c8986a;
+      --navbar-shadow:   0 8px 48px rgba(255, 160, 60, 0.28), 0 2px 16px rgba(0,0,0,0.5);
+    }
+
+    /* ===== NEW THEME 1: FOREST (Green/Nature) ===== */
+    body.forest {
+      --theme-accent:    #4caf50;
+      --theme-accent-2:  #81c784;
+      --theme-glow:      rgba(76, 175, 80, 0.5);
+      --theme-glow-soft: rgba(76, 175, 80, 0.12);
+      --theme-border:    rgba(76, 175, 80, 0.4);
+      --theme-bg-glass:  rgba(10, 30, 15, 0.55);
+      --theme-text:      #e8f5e9;
+      --theme-text-muted:#a5d6a7;
+      --navbar-shadow:   0 8px 48px rgba(76, 175, 80, 0.22), 0 2px 16px rgba(0,0,0,0.5);
+    }
+
+    /* ===== NEW THEME 2: AURORA (Purple/Pink) ===== */
+    body.aurora {
+      --theme-accent:    #e040fb;
+      --theme-accent-2:  #ce93d8;
+      --theme-glow:      rgba(224, 64, 251, 0.5);
+      --theme-glow-soft: rgba(224, 64, 251, 0.12);
+      --theme-border:    rgba(224, 64, 251, 0.4);
+      --theme-bg-glass:  rgba(30, 10, 40, 0.55);
+      --theme-text:      #f3e5f5;
+      --theme-text-muted:#ce93d8;
+      --navbar-shadow:   0 8px 48px rgba(224, 64, 251, 0.22), 0 2px 16px rgba(0,0,0,0.5);
+    }
+
+    .bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: var(--font-body);
+      color: var(--theme-text);
+      overflow-x: hidden;
+    }
+
+    /* =============================================
+       BACKGROUND SYSTEM
+    ============================================= */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      transition: opacity var(--transition);
+    }
+
+    .bg-layer img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.30);
+      transition: background var(--transition);
+    }
+
+    body.sun .bg-layer::after { background: rgba(20, 6, 0, 0.25); }
+    body.snow .bg-layer::after { background: rgba(0, 10, 30, 0.30); }
+    body.rain .bg-layer::after { background: rgba(0, 8, 25, 0.32); }
+    body.forest .bg-layer::after { background: rgba(0, 20, 0, 0.35); }
+    body.aurora .bg-layer::after { background: rgba(20, 0, 30, 0.35); }
+
+    #bg-space { z-index: 1; opacity: 1; }
+    #bg-rain  { z-index: 1; opacity: 0; }
+    #bg-snow  { z-index: 1; opacity: 0; }
+    #bg-sun   { z-index: 1; opacity: 0; }
+    #bg-forest { z-index: 1; opacity: 0; }
+    #bg-aurora { z-index: 1; opacity: 0; }
+
+    body.rain  #bg-space { opacity: 0; }
+    body.rain  #bg-rain  { opacity: 1; }
+    body.snow  #bg-space { opacity: 0; }
+    body.snow  #bg-snow  { opacity: 1; }
+    body.sun   #bg-space { opacity: 0; }
+    body.sun   #bg-sun   { opacity: 1; }
+    body.forest #bg-space { opacity: 0; }
+    body.forest #bg-forest { opacity: 1; }
+    body.aurora #bg-space { opacity: 0; }
+    body.aurora #bg-aurora { opacity: 1; }
+
+    /* =============================================
+       RAIN & SNOW PARTICLES
+    ============================================= */
+    #rain-canvas, #snow-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    body.rain #rain-canvas { opacity: 1; }
+    body.snow #snow-canvas { opacity: 1; }
+
+    /* =============================================
+       PAGE LAYOUT
+    ============================================= */
+    .page-wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 24px 60px;
+    }
+
+    /* =============================================
+       PRO GLASS NAVBAR - ENHANCED
+    ============================================= */
+    .navbar {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 72px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all var(--transition);
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Animated gradient border on hover */
+    .navbar::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 41px;
+      padding: 1px;
+      background: linear-gradient(90deg, 
+        var(--theme-accent), 
+        var(--theme-accent-2), 
+        var(--theme-accent));
+      background-size: 200% 100%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s;
+      animation: gradientMove 3s infinite linear;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .navbar:hover::before {
+      opacity: 1;
+    }
+
+    /* Glow effect on navbar hover */
+    .navbar::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 42px;
+      background: var(--theme-glow);
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: -1;
+    }
+
+    .navbar:hover::after {
+      opacity: 0.5;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 100%; height: 100%;
+      filter: drop-shadow(0 0 8px var(--theme-glow));
+      transition: filter var(--transition);
+    }
+
+    .logo-name {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, var(--theme-text), var(--theme-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all var(--transition);
+    }
+
+    /* Nav Menu */
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--theme-text-muted);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      backdrop-filter: blur(4px);
+    }
+
+    .nav-link svg {
+      width: 16px; height: 16px;
+      opacity: 0.7;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--theme-text);
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .nav-link:hover svg { opacity: 1; }
+
+    .nav-link.active {
+      color: var(--theme-accent);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-link.active svg {
+      opacity: 1;
+      filter: drop-shadow(0 0 4px var(--theme-glow));
+    }
+
+    /* Theme Switcher */
+    .theme-switcher {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 30px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--theme-accent);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover { 
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn .chevron {
+      width: 12px; height: 12px;
+      opacity: 0.6;
+      transition: transform 0.25s;
+    }
+    .theme-btn.open .chevron { transform: rotate(180deg); }
+
+    /* Dropdown */
+    .theme-dropdown {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      min-width: 180px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .theme-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--theme-text-muted);
+      border-radius: 14px;
+      transition: all 0.2s;
+    }
+
+    .theme-option:hover { 
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--theme-text);
+    }
+    .theme-option.selected { 
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--theme-accent);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 100px;
+      text-align: center;
+      max-width: 700px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--theme-accent);
+      margin-bottom: 18px;
+      padding: 6px 16px;
+      border-radius: 99px;
+      background: var(--theme-glow-soft);
+      border: 1px solid var(--theme-border);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--theme-text);
+      margin-bottom: 18px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--theme-text-muted);
+      max-width: 500px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 40px;
+      background: var(--theme-accent);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--theme-glow);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 800px) {
+      .page-wrapper { padding: 16px; }
+      .navbar {
+        flex-direction: column;
+        height: auto;
+        padding: 12px;
+        border-radius: 28px;
+      }
+      .navbar-top {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 8px;
+      }
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      .nav-link { padding: 8px 14px; font-size: 0.8rem; }
+      .theme-dropdown { left: 0; right: auto; }
+    }
+
+    @media (min-width: 801px) {
+      .navbar-top { display: contents; }
+    }
+
+    #bg-rain-video {
+      opacity: 0;
+      z-index: 1;
+      transition: opacity 0.6s;
+    }
+    body.rain #bg-rain-video {
+      opacity: 1;
+    }
+    body.rain #bg-rain {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKGROUND LAYERS -->
+  <div class="bg-layer" id="bg-space"><img src="https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1600&q=80" alt="space"/></div>
+  <div class="bg-layer" id="bg-rain"><img src="https://images.unsplash.com/photo-1438449805896-28a666819a20?w=1600&q=80" alt="rain"/></div>
+  <div class="bg-layer" id="bg-snow"><img src="https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=1600&q=80" alt="snow"/></div>
+  <div class="bg-layer" id="bg-sun"><img src="https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?w=1600&q=80" alt="sun"/></div>
+  <div class="bg-layer" id="bg-forest"><img src="https://images.unsplash.com/photo-1441974231531-c622288db8b4?w=1600&q=80" alt="forest"/></div>
+  <div class="bg-layer" id="bg-aurora"><img src="https://images.unsplash.com/photo-1536241451091-3910bc043070?w=1600&q=80" alt="aurora"/></div>
+  <div class="bg-layer" id="bg-rain-video"><video autoplay muted loop playsinline class="bg-video"><source src="/videos/your_video.mp4" type="video/mp4"></video></div>
+
+  <canvas id="rain-canvas"></canvas>
+  <canvas id="snow-canvas"></canvas>
+
+  <div class="page-wrapper">
+    <nav class="navbar">
+      <div class="navbar-top">
+        <a href="#" class="nav-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 36 36" fill="none">
+              <polygon points="18,3 33,30 3,30" fill="none" stroke="currentColor" stroke-width="2.5"/>
+              <line x1="9" y1="22" x2="27" y2="22" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <span class="logo-name">AAYUSH</span>
+        </a>
+        <div class="theme-switcher" id="themeSwitcher">
+          <button class="theme-btn" id="themeBtn">
+            <span id="themeIcon"></span>
+            <span id="themeLabel">Theme</span>
+            <svg class="chevron" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+          </button>
+          <div class="theme-dropdown" id="themeDropdown">
+            <div class="theme-option" data-theme="space">🌙 Night Mode</div>
+            <div class="theme-option" data-theme="rain">☔ Rain Mode</div>
+            <div class="theme-option" data-theme="snow">❄️ Snow Mode</div>
+            <div class="theme-option" data-theme="sun">☀️ Sunny Mode</div>
+            <div class="theme-option" data-theme="forest">🌲 Forest Mode</div>
+            <div class="theme-option" data-theme="aurora">🦄 Aurora Mode</div>
+          </div>
+        </div>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="#" class="nav-link active">🏠 Home</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">🎨 Work</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">📝 Blog</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">📄 Resume</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero">
+      <p class="hero-tag">Available for freelance</p>
+      <h1 class="hero-title">Hi, I'm <span>Aayush</span><br/>I design &amp; build things</h1>
+      <p class="hero-sub">A creative developer crafting memorable digital experiences — blending sharp design with clean code.</p>
+      <a href="#" class="hero-cta">View my work →</a>
+    </section>
+  </div>
+
+  <script>
+  const THEMES = {
+    space: { label: '🌙 Night Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>` },
+    rain: { label: '☔ Rain Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"><path d="M5 16v1M8 16v2M11 16v1M14 16v2" stroke-linecap="round"/><path d="M4 12a4 4 0 014-4h.5A5.5 5.5 0 1116 13H4z" stroke-linejoin="round"/></svg>` },
+    snow: { label: '❄️ Snow Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"><line x1="10" y1="2" x2="10" y2="18"/><line x1="2" y1="10" x2="18" y2="10"/><line x1="4.22" y1="4.22" x2="15.78" y2="15.78"/><line x1="15.78" y1="4.22" x2="4.22" y2="15.78"/></svg>` },
+    sun: { label: '☀️ Sunny Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"><circle cx="10" cy="10" r="3.5"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="10" y1="16" x2="10" y2="18"/><line x1="2" y1="10" x2="4" y2="10"/><line x1="16" y1="10" x2="18" y2="10"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="14.36" y1="14.36" x2="15.78" y2="15.78"/><line x1="15.78" y1="4.22" x2="14.36" y2="5.64"/><line x1="5.64" y1="14.36" x2="4.22" y2="15.78"/></svg>` },
+    forest: { label: '🌲 Forest Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"><path d="M10 2L3 18h14L10 2z"/><path d="M10 8l-3 6h6l-3-6z"/></svg>` },
+    aurora: { label: '🦄 Aurora Mode', icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"><path d="M2 10l4-4 3 6 4-8 3 6 2-2" stroke-linecap="round"/><circle cx="10" cy="14" r="2"/></svg>` }
+  };
+
+  const body = document.body;
+  const themeBtn = document.getElementById('themeBtn');
+  const themeIcon = document.getElementById('themeIcon');
+  const themeLabel = document.getElementById('themeLabel');
+  const dropdown = document.getElementById('themeDropdown');
+  const options = document.querySelectorAll('.theme-option');
+
+  let currentTheme = localStorage.getItem('aayush-theme') || 'space';
+
+  function applyTheme(name) {
+    body.classList.remove('rain', 'snow', 'sun', 'forest', 'aurora');
+    if (name !== 'space') body.classList.add(name);
+    currentTheme = name;
+    localStorage.setItem('aayush-theme', name);
+    themeIcon.innerHTML = THEMES[name].icon;
+    themeLabel.innerHTML = THEMES[name].label;
+    options.forEach(opt => opt.classList.toggle('selected', opt.dataset.theme === name));
+  }
+
+  function toggleDropdown(force) {
+    dropdown.classList.toggle('open', force !== undefined ? force : !dropdown.classList.contains('open'));
+    themeBtn.classList.toggle('open', dropdown.classList.contains('open'));
+  }
+
+  themeBtn.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(); });
+  options.forEach(opt => {
+    opt.addEventListener('click', () => { applyTheme(opt.dataset.theme); toggleDropdown(false); });
+  });
+  document.addEventListener('click', () => toggleDropdown(false));
+  applyTheme(currentTheme);
+
+  // Rain particles
+  (function() {
+    const canvas = document.getElementById('rain-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let drops = [], animId = null;
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function init() {
+      drops = [];
+      for (let i = 0; i < (canvas.width / 6); i++) {
+        drops.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, len: Math.random() * 18 + 8, speed: Math.random() * 9 + 6, opacity: Math.random() * 0.35 + 0.1 });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drops.forEach(d => {
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - 1, d.y + d.len);
+        ctx.strokeStyle = `rgba(130,200,255,${d.opacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        d.y += d.speed;
+        if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
+      });
+      animId = requestAnimationFrame(draw);
+    }
+    function start() { if (!animId) { resize(); init(); draw(); } }
+    function stop() { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+    window.addEventListener('resize', () => { if (animId) { resize(); init(); } });
+    const obs = new MutationObserver(() => body.classList.contains('rain') ? start() : stop());
+    obs.observe(body, { attributes: true, attributeFilter: ['class'] });
+    if (body.classList.contains('rain')) start();
+  })();
+
+  // Snow particles
+  (function() {
+    const canvas = document.getElementById('snow-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let flakes = [], animId = null;
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function init() {
+      flakes = [];
+      for (let i = 0; i < (canvas.width / 10); i++) {
+        flakes.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 2.5 + 0.8, speed: Math.random() * 1.5 + 0.4, drift: (Math.random() - 0.5) * 0.4, opacity: Math.random() * 0.5 + 0.15 });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      flakes.forEach(f => {
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,235,255,${f.opacity})`;
+        ctx.fill();
+        f.y += f.speed;
+        f.x += f.drift;
+        if (f.y > canvas.height) { f.y = -4; f.x = Math.random() * canvas.width; }
+        if (f.x > canvas.width) f.x = 0;
+        if (f.x < 0) f.x = canvas.width;
+      });
+      animId = requestAnimationFrame(draw);
+    }
+    function start() { if (!animId) { resize(); init(); draw(); } }
+    function stop() { if (animId) { cancelAnimationFrame(animId); animId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+    window.addEventListener('resize', () => { if (animId) { resize(); init(); } });
+    const obs = new MutationObserver(() => body.classList.contains('snow') ? start() : stop());
+    obs.observe(body, { attributes: true, attributeFilter: ['class'] });
+    if (body.classList.contains('snow')) start();
+  })();
+  </script>
+</body>
+</html>

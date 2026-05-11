@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Theme UI</title>
+
+<style>
+
+/* ===== RESET ===== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+  height:100vh;
+  overflow:hidden;
+  color:white;
+  transition:0.5s;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:15px;
+  z-index:10;
+}
+
+.navbar button{
+  padding:10px 20px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  color:white;
+}
+
+/* ===== VIDEO ===== */
+.video-bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+.video-bg video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ===== GLASS CARD ===== */
+.glass{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:350px;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+
+  backdrop-filter:blur(20px);
+  transition:0.5s;
+}
+
+/* ===== THEMES ===== */
+
+/* 🌧️ RAIN */
+body.rain{
+  --glass: rgba(0, 100, 255, 0.15);
+  --text: #ffffff;
+}
+
+body.rain .glass{
+  background: var(--glass);
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+/* 🔥 FIRE */
+body.fire{
+  --glass: rgba(255, 80, 0, 0.2);
+  --text: #fff3e0;
+}
+
+body.fire .glass{
+  background: var(--glass);
+  border:1px solid rgba(255,150,0,0.3);
+}
+
+/* 🌊 OCEAN */
+body.ocean{
+  --glass: rgba(0, 200, 255, 0.15);
+  --text: #e0f7ff;
+}
+
+body.ocean .glass{
+  background: var(--glass);
+  border:1px solid rgba(0,200,255,0.3);
+}
+
+/* ===== TEXT ===== */
+.glass h2{
+  color:var(--text);
+}
+
+</style>
+</head>
+
+<body class="rain">
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <button onclick="setTheme('rain')">Rain</button>
+  <button onclick="setTheme('fire')">Fire</button>
+  <button onclick="setTheme('ocean')">Ocean</button>
+</div>
+
+<!-- VIDEO -->
+<div class="video-bg">
+  <video id="bgVideo" autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+</div>
+
+<!-- GLASS -->
+<div class="glass">
+  <h2>Theme Glass UI</h2>
+  <p>Everything changes</p>
+</div>
+
+<script>
+
+const video = document.getElementById("bgVideo");
+
+/* THEME DATA */
+const themes = {
+  rain: {
+    video: "https://www.w3schools.com/howto/rain.mp4"
+  },
+  fire: {
+    video: "https://www.w3schools.com/html/mov_bbb.mp4"
+  },
+  ocean: {
+    video: "https://www.w3schools.com/howto/rain.mp4"
+  }
+};
+
+/* CHANGE THEME */
+function setTheme(theme){
+  document.body.className = theme;
+
+  video.src = themes[theme].video;
+  video.load();
+  video.play();
+}
+
+</script>
+
+</body>
+</html>

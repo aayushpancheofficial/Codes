@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi Video Glass</title>
+
+<style>
+
+/* ===== RESET ===== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:30px;
+  background:#050606;
+}
+
+/* ===== GLASS CARD ===== */
+.glass{
+  position:relative;
+  width:280px;
+  height:200px;
+  border-radius:20px;
+  overflow:hidden;
+
+  border:1px solid rgba(255,255,255,0.2);
+  backdrop-filter:blur(15px);
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* ===== VIDEO INSIDE ===== */
+.glass video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ===== GLASS OVERLAY ===== */
+.glass::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(20px);
+}
+
+/* ===== TEXT ===== */
+.content{
+  position:relative;
+  z-index:2;
+  padding:15px;
+  color:white;
+}
+
+/* ===== OPTIONAL EFFECTS ===== */
+
+/* Rain effect */
+.rain{
+  position:absolute;
+  inset:0;
+  background-image:repeating-linear-gradient(
+    120deg,
+    rgba(255,255,255,0.3) 0px,
+    rgba(255,255,255,0.3) 2px,
+    transparent 3px,
+    transparent 12px
+  );
+  animation:rainFall 0.4s linear infinite;
+  opacity:0.2;
+}
+
+@keyframes rainFall{
+  from{transform:translateY(-100%);}
+  to{transform:translateY(100%);}
+}
+
+/* Fire glow */
+.fire{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle, rgba(255,100,0,0.3), transparent);
+}
+
+/* Ocean wave tint */
+.ocean{
+  position:absolute;
+  inset:0;
+  background:rgba(0,150,255,0.2);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🌧️ RAIN CARD -->
+<div class="glass">
+  <video autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+  <div class="rain"></div>
+  <div class="content">
+    <h3>Rain</h3>
+  </div>
+</div>
+
+<!-- 🔥 FIRE CARD -->
+<div class="glass">
+  <video autoplay muted loop>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4">
+  </video>
+  <div class="fire"></div>
+  <div class="content">
+    <h3>Fire</h3>
+  </div>
+</div>
+
+<!-- 🌊 OCEAN CARD -->
+<div class="glass">
+  <video autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+  <div class="ocean"></div>
+  <div class="content">
+    <h3>Ocean</h3>
+  </div>
+</div>
+
+</body>
+</html>

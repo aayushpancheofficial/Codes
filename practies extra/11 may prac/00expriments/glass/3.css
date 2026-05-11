@@ -1,0 +1,165 @@
+body {
+  background: url('leaf.jpg') no-repeat center/cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Video Background */
+.video-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.video-bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+---------------
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* VIDEO BACKGROUND */
+.video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+
+.video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* DARK OVERLAY (IMPORTANT for contrast) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: -1;
+}
+
+/* CENTER LAYOUT */
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* GLASS PRO CARD */
+.glass-pro {
+  position: relative;
+  width: 380px;
+  padding: 28px;
+  border-radius: 24px;
+  overflow: hidden;
+
+  /* Glass */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.6),
+    inset 0 1px 1px rgba(255,255,255,0.2);
+
+  color: white;
+  text-align: center;
+  transition: 0.4s ease;
+}
+
+/* LIGHT REFLECTION */
+.glass-pro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* NOISE TEXTURE */
+.glass-pro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* TEXT */
+.glass-pro h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.glass-pro p {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+/* BUTTONS */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: none;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.btn.secondary {
+  background: rgba(0,255,200,0.2);
+}
+
+/* HOVER EFFECT */
+.glass-pro:hover {
+  transform: translateY(-10px) scale(1.03);
+  backdrop-filter: blur(25px);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.8),
+    0 0 30px rgba(0,255,200,0.2);
+}

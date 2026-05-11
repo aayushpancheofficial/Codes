@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theme Switcher</title>
+
+<style>
+
+/* ===== RESET ===== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+  height:100vh;
+  overflow:hidden;
+  color:white;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:15px;
+  z-index:10;
+}
+
+.navbar button{
+  padding:10px 20px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(10px);
+  color:white;
+
+  transition:0.3s;
+}
+
+.navbar button:hover{
+  background:rgba(255,255,255,0.4);
+}
+
+/* ===== VIDEO BACKGROUND ===== */
+.video-bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+}
+
+.video-bg video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:opacity 0.5s ease;
+}
+
+/* fade effect */
+.fade-out{
+  opacity:0;
+}
+
+/* ===== CENTER TEXT ===== */
+.content{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <button onclick="changeTheme('rain')">Rain</button>
+  <button onclick="changeTheme('fire')">Fire</button>
+  <button onclick="changeTheme('ocean')">Ocean</button>
+</div>
+
+<!-- VIDEO BACKGROUND -->
+<div class="video-bg">
+  <video id="bgVideo" autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="content">
+  Theme Switcher UI
+</div>
+
+<script>
+
+/* ===== VIDEO SOURCES ===== */
+const themes = {
+  rain: "https://www.w3schools.com/howto/rain.mp4",
+  fire: "https://www.w3schools.com/html/mov_bbb.mp4",
+  ocean: "https://www.w3schools.com/howto/rain.mp4"
+};
+
+const video = document.getElementById("bgVideo");
+
+/* ===== CHANGE THEME ===== */
+function changeTheme(theme){
+  video.classList.add("fade-out");
+
+  setTimeout(()=>{
+    video.src = themes[theme];
+    video.load();
+    video.play();
+
+    video.classList.remove("fade-out");
+  }, 300);
+}
+
+</script>
+
+</body>
+</html>

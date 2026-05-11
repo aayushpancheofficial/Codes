@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Glass Pro</title>
+
+<style>
+
+/* ===== RESET ===== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  color:white;
+}
+
+/* ===== BACKGROUND VIDEO ===== */
+.bg-video{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+}
+
+.bg-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:brightness(0.6) contrast(1.2);
+}
+
+/* ===== OVERLAY ===== */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.3);
+  z-index:-1;
+}
+
+/* ===== GLASS ===== */
+.glass{
+  position:relative;
+  width:500px;
+  height:300px;
+  border-radius:20px;
+  overflow:hidden;
+
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.3);
+
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);
+}
+
+/* ===== VIDEO INSIDE GLASS ===== */
+.glass video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ===== GLASS OVERLAY ===== */
+.glass::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(20px);
+}
+
+/* ===== WATER DROPS ===== */
+.water{
+  position:absolute;
+  inset:0;
+  background:url("https://i.imgur.com/6Iej2c3.png");
+  background-size:cover;
+  opacity:0.35;
+  pointer-events:none;
+}
+
+/* ===== MOVING RAIN ===== */
+.rain{
+  position:absolute;
+  inset:0;
+
+  background-image:repeating-linear-gradient(
+    120deg,
+    rgba(255,255,255,0.3) 0px,
+    rgba(255,255,255,0.3) 2px,
+    transparent 3px,
+    transparent 12px
+  );
+
+  animation:rainFall 0.4s linear infinite;
+  opacity:0.2;
+}
+
+@keyframes rainFall{
+  from{transform:translateY(-100%);}
+  to{transform:translateY(100%);}
+}
+
+/* ===== TEXT ===== */
+.content{
+  position:relative;
+  z-index:2;
+  padding:20px;
+}
+
+h1{
+  font-size:32px;
+  margin-top:150px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND VIDEO -->
+<div class="bg-video">
+  <video autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+</div>
+
+<div class="overlay"></div>
+
+<!-- GLASS -->
+<div class="glass">
+
+  <!-- video inside glass -->
+  <video autoplay muted loop>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+
+  <!-- effects -->
+  <div class="water"></div>
+  <div class="rain"></div>
+
+  <!-- text -->
+  <div class="content">
+    <h1>Rain Glass</h1>
+  </div>
+
+</div>
+
+</body>
+</html>

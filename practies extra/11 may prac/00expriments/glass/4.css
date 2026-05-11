@@ -1,0 +1,76 @@
+body {
+  background: url('leaf.jpg') no-repeat center/cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Video Background */
+.video-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.video-bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.glass-pro {
+  position: relative;
+  width: 500px;
+  height: 300px;
+  padding: 20px;
+  border-radius: 20px;
+  overflow: hidden;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* 💧 WATER DROPS */
+.water-drops {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: url("https://i.imgur.com/6Iej2c3.png"); /* raindrop texture */
+  background-size: cover;
+  opacity: 0.35;
+}
+
+/* subtle movement */
+.water-drops {
+  animation: moveDrops 10s linear infinite;
+}
+
+@keyframes moveDrops {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 200px;
+  }
+}
+.glass-pro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+}

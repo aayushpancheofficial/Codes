@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>AAYUSH | Dynamic Theme Navbar</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-gradient);
+      padding: 2rem 1.5rem;
+      transition: background 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    /* THEME VARIABLES – dynamically changed via JS but with clean defaults */
+    :root {
+      /* fallback sunny (light) as default */
+      --bg-gradient: linear-gradient(145deg, #fff7e8 0%, #ffe6b3 100%);
+      --card-bg: rgba(255, 250, 235, 0.92);
+      --navbar-bg: rgba(255, 245, 215, 0.96);
+      --text-primary: #3b2a1f;
+      --text-nav: #5c3e1f;
+      --nav-hover: #f3b33d;
+      --nav-active: #e09d1e;
+      --border-light: rgba(245, 195, 85, 0.4);
+      --shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+      --accent-glow: #ffc868;
+      --mode-icon-bg: #f0e0b0;
+      --mode-btn-active: #f1c15c;
+      --heading-color: #2d2418;
+    }
+
+    /* ----- Rainy Mode (cool, deep blues, mist) ----- */
+    body.theme-rainy {
+      --bg-gradient: linear-gradient(135deg, #1e2b3c 0%, #14222e 100%);
+      --card-bg: rgba(28, 40, 51, 0.85);
+      --navbar-bg: rgba(18, 30, 41, 0.92);
+      --text-primary: #e1ecf4;
+      --text-nav: #cbdbe6;
+      --nav-hover: #73b1d8;
+      --nav-active: #4c9ed9;
+      --border-light: rgba(72, 132, 174, 0.5);
+      --shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(90, 162, 204, 0.2);
+      --accent-glow: #5fa7cf;
+      --mode-icon-bg: #2a3f50;
+      --mode-btn-active: #2c73a1;
+      --heading-color: #e7edf5;
+    }
+
+    /* ----- Snow Mode (crisp, frosty, icy elegance) ----- */
+    body.theme-snow {
+      --bg-gradient: linear-gradient(125deg, #ecf9ff 0%, #d9eaf5 100%);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --navbar-bg: rgba(245, 250, 255, 0.94);
+      --text-primary: #1f3b4c;
+      --text-nav: #1f4970;
+      --nav-hover: #2b7a9e;
+      --nav-active: #1f6390;
+      --border-light: rgba(120, 180, 220, 0.5);
+      --shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.02);
+      --accent-glow: #8bc9e8;
+      --mode-icon-bg: #e2f0fc;
+      --mode-btn-active: #488bb6;
+      --heading-color: #1c4e6e;
+    }
+
+    /* ----- Sunny Mode (original warm, bright) explicit but default ----- */
+    body.theme-sunny {
+      --bg-gradient: linear-gradient(145deg, #fff7e8 0%, #ffe6b3 100%);
+      --card-bg: rgba(255, 250, 235, 0.92);
+      --navbar-bg: rgba(255, 245, 215, 0.96);
+      --text-primary: #3b2a1f;
+      --text-nav: #5c3e1f;
+      --nav-hover: #f3b33d;
+      --nav-active: #e09d1e;
+      --border-light: rgba(245, 195, 85, 0.4);
+      --shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.12);
+      --accent-glow: #ffc868;
+      --mode-icon-bg: #f0e0b0;
+      --mode-btn-active: #f1c15c;
+      --heading-color: #2d2418;
+    }
+
+    /* main container */
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* navbar card */
+    .navbar-card {
+      width: 100%;
+      background: var(--navbar-bg);
+      backdrop-filter: blur(14px);
+      border-radius: 2.2rem;
+      box-shadow: var(--shadow);
+      padding: 0.9rem 2rem;
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    /* logo / brand area */
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--heading-color);
+      background: linear-gradient(125deg, var(--heading-color) 30%, var(--nav-active) 80%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      transition: all 0.2s;
+    }
+
+    .brand span {
+      background: none;
+      background-clip: unset;
+      -webkit-background-clip: unset;
+      color: var(--text-nav);
+      font-weight: 500;
+      font-size: 1.6rem;
+    }
+
+    /* nav links */
+    .nav-links {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.02);
+      padding: 0.2rem;
+      border-radius: 3rem;
+    }
+
+    .nav-item {
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+      font-weight: 550;
+      background: transparent;
+      border: none;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text-nav);
+      transition: all 0.2s ease;
+      letter-spacing: -0.2px;
+      backdrop-filter: blur(2px);
+    }
+
+    .nav-item:hover {
+      background: var(--nav-hover);
+      color: #1f1a10;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-item.active {
+      background: var(--nav-active);
+      color: #ffffff;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* theme toggle group (rainy, snow, sunny) */
+    .theme-group {
+      display: flex;
+      gap: 0.55rem;
+      background: var(--mode-icon-bg);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4rem;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--border-light);
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: 3rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      backdrop-filter: blur(2px);
+    }
+
+    .theme-btn span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+    }
+
+    .theme-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(1.02);
+    }
+
+    .theme-btn.active-mode {
+      background: var(--mode-btn-active);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      color: #1f2a1c;
+    }
+
+    /* additional hero / showcase area (just to reflect theme changes) */
+    .showcase {
+      margin-top: 3rem;
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border-radius: 2rem;
+      padding: 2rem 2rem;
+      text-align: center;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+    }
+
+    .showcase h2 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--heading-color);
+      background: linear-gradient(120deg, var(--heading-color), var(--nav-active));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .showcase p {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    .showcase small {
+      display: inline-block;
+      margin-top: 1rem;
+      opacity: 0.7;
+      color: var(--text-nav);
+      font-size: 0.85rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 750px) {
+      .navbar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+      }
+      .nav-links {
+        justify-content: center;
+      }
+      .theme-group {
+        justify-content: center;
+        align-self: center;
+      }
+      .brand {
+        justify-content: center;
+      }
+      .navbar-card {
+        padding: 1rem 1.2rem;
+      }
+      .nav-item {
+        padding: 0.45rem 1rem;
+        font-size: 0.9rem;
+      }
+      .theme-btn {
+        font-size: 1.2rem;
+        padding: 0.3rem 0.5rem;
+      }
+      .theme-btn span {
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 0.2rem;
+      }
+      .nav-item {
+        padding: 0.4rem 0.75rem;
+      }
+    }
+
+    /* extra micro interaction */
+    button {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.75rem;
+      color: var(--text-nav);
+      opacity: 0.7;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="theme-sunny">
+<div class="app-container">
+  <!-- main dynamic navbar card -->
+  <div class="navbar-card">
+    <div class="navbar-inner">
+      <!-- brand area with AAYUSH -->
+      <div class="brand">
+        AAYUSH
+      </div>
+
+      <!-- navigation links (Home, Work, Blog, Resume) -->
+      <div class="nav-links" id="navLinksContainer">
+        <button class="nav-item" data-nav="home">Home</button>
+        <button class="nav-item" data-nav="work">Work</button>
+        <button class="nav-item" data-nav="blog">Blog</button>
+        <button class="nav-item" data-nav="resume">Resume</button>
+      </div>
+
+      <!-- theme changer: Rainy Mode, Snow Mode, Sunny Mode exactly as reference -->
+      <div class="theme-group" id="themeGroup">
+        <button class="theme-btn" data-theme="rainy" title="Rainy Mode">
+          🌧️ <span>Rainy</span>
+        </button>
+        <button class="theme-btn" data-theme="snow" title="Snow Mode">
+          ❄️ <span>Snow</span>
+        </button>
+        <button class="theme-btn" data-theme="sunny" title="Sunny Mode">
+          ☀️ <span>Sunny</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- demo content area : shows active theme and current nav selection (makes it interactive) -->
+  <div class="showcase" id="showcaseBlock">
+    <h2 id="dynamicGreeting">Welcome, AAYUSH.</h2>
+    <p id="dynamicMessage">You are currently on <strong>Home</strong> section.<br>Experience the ambient theme change.</p>
+    <small id="themeStatus">☀️ Sunny Mode active — bright & warm</small>
+  </div>
+  <footer>
+    ✨ click theme icons → rainy | snow | sunny • navbar fully theme-aware
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // --- DOM elements
+    const body = document.body;
+    const navButtons = document.querySelectorAll('.nav-item');
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const showcaseTitle = document.getElementById('dynamicGreeting');
+    const showcaseMessage = document.getElementById('dynamicMessage');
+    const themeStatusSpan = document.getElementById('themeStatus');
+
+    // default active nav => 'home'
+    let currentActiveNav = 'home';
+    // default theme = sunny
+    let currentTheme = 'sunny';
+
+    // ========== 1. THEME MANAGEMENT ==========
+    // function to set active class on theme buttons based on currentTheme
+    function updateThemeButtonUI() {
+      themeBtns.forEach(btn => {
+        const themeValue = btn.getAttribute('data-theme');
+        if (themeValue === currentTheme) {
+          btn.classList.add('active-mode');
+        } else {
+          btn.classList.remove('active-mode');
+        }
+      });
+    }
+
+    // change theme: remove old theme class, add new one, update body class, store & update status text
+    function setTheme(theme) {
+      // remove existing theme classes
+      body.classList.remove('theme-rainy', 'theme-snow', 'theme-sunny');
+      // add new theme class
+      body.classList.add(`theme-${theme}`);
+      currentTheme = theme;
+      // update localStorage (optional but nice)
+      localStorage.setItem('aayush_theme', theme);
+      // update active class on theme buttons
+      updateThemeButtonUI();
+      // update theme status message in showcase area
+      let themeDisplayName = '';
+      let themeIcon = '';
+      if (theme === 'rainy') {
+        themeDisplayName = 'Rainy Mode';
+        themeIcon = '🌧️';
+      } else if (theme === 'snow') {
+        themeDisplayName = 'Snow Mode';
+        themeIcon = '❄️';
+      } else {
+        themeDisplayName = 'Sunny Mode';
+        themeIcon = '☀️';
+      }
+      themeStatusSpan.innerHTML = `${themeIcon} ${themeDisplayName} active — ${theme === 'rainy' ? 'cool drizzle & moody blues' : (theme === 'snow' ? 'crisp frost & icy elegance' : 'golden glow & warmth')}`;
+      // optional extra: we can also apply some dynamic transition effect (no need complex)
+    }
+
+    // ----- 2. NAVIGATION LOGIC (update active nav button & dynamic content)
+    function setActiveNav(navId) {
+      // remove active class from all nav items
+      navButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-nav') === navId) {
+          btn.classList.add('active');
+        }
+      });
+      currentActiveNav = navId;
+      // update showcase content based on the selected nav
+      updateShowcaseContent(navId);
+    }
+
+    // update the dynamic text area based on selected navigation & current theme (just nice personalization)
+    function updateShowcaseContent(navId) {
+      let titleText = '';
+      let messageText = '';
+      switch (navId) {
+        case 'home':
+          titleText = '🏠 Home · AAYUSH';
+          messageText = 'Welcome to the creative space. You are exploring the Home section. Build ideas & explore themes.';
+          break;
+        case 'work':
+          titleText = '💼 Work & Projects';
+          messageText = 'Showcasing design systems, immersive web experiences, and creative engineering.';
+          break;
+        case 'blog':
+          titleText = '📝 Blog · Musings';
+          messageText = 'Thoughts on UI, frontend architecture, and theme-driven interfaces.';
+          break;
+        case 'resume':
+          titleText = '📄 Resume / CV';
+          messageText = 'Interactive journey — experience, skills, and design philosophy.';
+          break;
+        default:
+          titleText = 'AAYUSH';
+          messageText = 'Navigate through sections.';
+      }
+      showcaseTitle.innerHTML = titleText;
+      showcaseMessage.innerHTML = `${messageText}<br><span style="font-size:0.85rem; opacity:0.8;">✨ current theme influences the whole interface.</span>`;
+    }
+
+    // also when theme changes we might update the message slightly for delight (optional)
+    function addThemeFlavorToMessage() {
+      // small nice touch: we won't override full content but we can slightly affect message based on theme? 
+      // keep showcase consistency: just ensure message keeps main content but we could re-set same nav content to keep consistency.
+      if (currentActiveNav) {
+        updateShowcaseContent(currentActiveNav);
+      }
+    }
+
+    // attach navigation event listeners
+    function bindNavEvents() {
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const navValue = btn.getAttribute('data-nav');
+          if (navValue) {
+            setActiveNav(navValue);
+          }
+        });
+      });
+    }
+
+    // attach theme event listeners
+    function bindThemeEvents() {
+      themeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const themeValue = btn.getAttribute('data-theme');
+          if (themeValue && themeValue !== currentTheme) {
+            setTheme(themeValue);
+            // when theme changes: add a small ripple effect on body? but keep fresh content
+            addThemeFlavorToMessage();
+            // optional: also subtle animation to showcase
+            const showcase = document.querySelector('.showcase');
+            showcase.style.transform = 'scale(0.99)';
+            setTimeout(() => {
+              showcase.style.transform = '';
+            }, 150);
+          }
+        });
+      });
+    }
+
+    // load stored theme from localStorage if any (preference)
+    function loadStoredTheme() {
+      const storedTheme = localStorage.getItem('aayush_theme');
+      if (storedTheme && (storedTheme === 'rainy' || storedTheme === 'snow' || storedTheme === 'sunny')) {
+        setTheme(storedTheme);
+      } else {
+        // default sunny, but ensure body class set and active ui button
+        setTheme('sunny');
+      }
+    }
+
+    // initialize: restore last active nav from sessionStorage? not necessary but we keep home default + maybe remember?
+    // we can optionally remember last selected nav? but spec just says changable theme and nav bar with home/work/blog/resume,
+    // but we want complete functionality.
+    function init() {
+      bindNavEvents();
+      bindThemeEvents();
+      loadStoredTheme();          // apply theme from storage or sunny
+      // set default active nav to 'home' and update visual
+      setActiveNav('home');
+      // additional fallback: if any nav button already had active class from html? we ensure home active
+      // also match the theme status update manually after load.
+      // final sync for any dynamic theme content
+      setTimeout(() => {
+        addThemeFlavorToMessage();
+      }, 20);
+    }
+
+    // optional: Add parallax or just clean event.
+    init();
+  })();
+</script>
+</body>
+</html>
